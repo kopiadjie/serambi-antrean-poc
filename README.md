@@ -60,3 +60,20 @@ Melalui *Dashboard Admin*, petugas memiliki kendali penuh untuk memvalidasi kese
 5. Akses layanan:
 ``` Masyarakat: http://localhost```
 ``` Dashboard Admin: http://localhost/admin.html```
+
+## 🔄 Alur Sistem (System Flow)
+
+Berikut adalah tahapan operasional sistem dari sisi pengguna hingga proses verifikasi selesai:
+
+1. **Akses Antrean (Entry Point)** Masyarakat memindai Kode QR yang disediakan oleh petugas di lokasi. Pemindaian ini akan mengarahkan pengguna ke halaman web antrean secara otomatis tanpa perlu mengunduh aplikasi tambahan.
+
+2. **Pengambilan Nomor (Issuing)** Pengguna menekan tombol **"Ambil Nomor Antrean"**. Sistem akan mendaftarkan ID unik perangkat ke database dan menampilkan nomor posisi antrean saat ini secara *real-time*.
+
+3. **Ruang Tunggu Virtual (Waiting)** Pengguna dapat menunggu di area yang nyaman sambil memantau pergerakan antrean di layar ponsel. Halaman akan terus memperbarui posisi urutan secara otomatis tanpa perlu memuat ulang (*refresh*) halaman.
+
+4. **Verifikasi Identitas (Validation)** Saat tiba gilirannya, pengguna menunjukkan layar ponsel kepada petugas loket. Petugas akan mencocokkan identitas fisik (KTP) dengan data yang tertera.
+
+5. **Finalisasi Otoritas (Approval)** - **Diterima**: Jika data sesuai, petugas menekan tombol "Terima" pada *Dashboard Admin*. Layar ponsel pengguna akan otomatis berubah menjadi hijau dengan penanda khusus **"-A"** (Terverifikasi).
+   - **Ditolak**: Jika ditemukan ketidaksesuaian (perwakilan antrean/data tidak valid), petugas menekan tombol "Tolak", dan sesi antrean pengguna akan segera hangus.
+
+6. **Layanan Selesai** Nomor yang telah terverifikasi (**-A**) menjadi bukti sah bagi pengguna untuk melanjutkan proses transaksi di loket pelayanan.
