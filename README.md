@@ -1,33 +1,54 @@
-📌 Background & Problem Statement
-Dalam operasional layanan publik skala besar (seperti penukaran uang SERAMBI), antrean fisik yang panjang seringkali menimbulkan beberapa kendala kritikal:
+# Serambi Antrean PoC (Proof of Concept) 🛡️
 
-Inefisiensi & Ketidaknyamanan: Masyarakat harus berdiri dalam waktu lama, yang menurunkan kualitas layanan.
+**Serambi Antrean** adalah sistem manajemen layanan publik digital yang dirancang untuk mengoptimalkan efisiensi operasional dan kenyamanan pengguna dalam proses antrean skala besar. Proyek ini hadir sebagai solusi teknologi untuk mentransformasi metode antrean konvensional menjadi ekosistem yang lebih teratur dan transparan.
 
-Pelanggaran Antrean: Praktik "memotong antrean" dari tengah sering terjadi akibat pengawasan manual yang sulit pada barisan yang panjang.
+---
 
-Penyalahgunaan Identitas: Adanya upaya mewakilkan antrean atau ketidaksesuaian identitas (KTP) yang sering luput dari pemeriksaan petugas di barisan fisik.
+## 📌 Latar Belakang & Permasalahan
 
-💡 The Solution: Serambi Antrean PoC
-Proyek ini merupakan Proof of Concept (PoC) sistem intervensi digital yang merombak antrean fisik menjadi antrean berbasis data yang terkendali. Solusi yang ditawarkan meliputi:
+Dalam penyelenggaraan layanan publik dengan volume massa yang tinggi, metode antrean fisik konvensional seringkali menghadapi tantangan logistik yang signifikan:
 
-QR-Gate Access: Antrean hanya dapat diambil melalui pemindaian kode QR di lokasi fisik oleh panitia, memastikan hanya masyarakat yang hadir di lokasi yang mendapatkan nomor.
+1. **Optimalisasi Kenyamanan**: Antrean baris yang panjang mengharuskan masyarakat berdiri dalam waktu lama, yang secara langsung dapat menurunkan tingkat kepuasan layanan.
+2. **Integritas Urutan Antrean**: Sulitnya pengawasan manual pada barisan fisik membuka celah bagi praktik manipulasi urutan (penyerobotan) yang merugikan pengguna lain.
+3. **Validasi Identitas**: Kurangnya sistem verifikasi yang terintegrasi memudahkan upaya penggunaan identitas yang tidak sah (perwakilan antrean) atau ketidaksesuaian data KTP yang luput dari pemeriksaan petugas.
 
-Virtual Waiting Room: Masyarakat dapat menunggu dengan nyaman di area duduk yang disediakan tanpa harus berdiri di barisan, karena posisi antrean terpantau secara real-time melalui perangkat masing-masing.
+---
 
-Anti-Jumping Mechanism: Sistem penomoran terkunci secara urut pada database, sehingga tidak ada celah untuk memotong urutan secara ilegal.
+## 💡 Solusi: Intervensi Digital
 
-Strict Verification Point: Petugas memiliki otoritas penuh melalui Dashboard Admin untuk melakukan validasi kesesuaian identitas (KTP) sebelum status antrean diubah menjadi "Diterima". Antrean yang tidak sesuai aturan dapat "Ditolak" secara instan oleh sistem, memberikan efek jera terhadap pelanggaran aturan.
+Proyek ini menghadirkan intervensi teknologi untuk merombak antrean fisik menjadi antrean berbasis data yang terkendali:
 
-🛠️ Technical Highlights
-Automated Sync: Sinkronisasi status antara Admin dan User dalam < 2 detik.
+### 📱 Ruang Tunggu Virtual
+Masyarakat dapat memantau posisi antrean melalui perangkat masing-masing secara *real-time*. Hal ini memberikan fleksibilitas bagi pengguna untuk menunggu di area yang lebih nyaman tanpa harus berada dalam barisan fisik yang statis.
 
-Smart Suffix: Penambahan identitas visual -A pada nomor yang telah tervalidasi sebagai bukti autentik saat menuju loket.
+### 🔒 Konsistensi Alur Urutan
+Sistem menggunakan algoritma penomoran yang terkunci secara otomatis pada database. Mekanisme ini memastikan setiap nomor dikeluarkan berdasarkan urutan waktu yang adil, sehingga menutup celah manipulasi urutan secara ilegal.
 
-Lightweight Architecture: Menggunakan Node.js dan SQLite untuk performa cepat dengan sumber daya minimal.
+### ⚖️ Verifikasi Otoritas Terpusat
+Melalui *Dashboard Admin*, petugas memiliki kendali penuh untuk memvalidasi kesesuaian identitas pengguna. Antrean hanya dinyatakan sah (**Diterima**) setelah melalui pengecekan fisik data identitas. Sistem secara tegas mengizinkan pembatalan (**Ditolak**) terhadap upaya pelanggaran aturan guna menjaga keadilan bagi seluruh pengguna.
 
-Kenapa Deskripsi Ini Efektif?
-Menjelaskan "Intervensi": Anda tidak hanya membuat aplikasi, tapi memberikan intervensi terhadap perilaku masyarakat (mencegah srobot, mencegah perwakilan).
+---
 
-Kesesuaian Identitas: Menonjolkan fitur "Tolak" sebagai alat penegakan aturan (enforcement) membuat sistem Anda terlihat memiliki nilai keamanan yang tinggi.
+## 🛠️ Keunggulan Teknis
 
-Human-Centric: Mengangkat masalah "tidak perlu berdiri lama" menunjukkan bahwa Anda peduli pada user experience masyarakat di Medan.
+* **Real-Time Synchronization**: Sinkronisasi status antara panel admin dan perangkat pengguna berlangsung secara instan (< 2 detik).
+* **Smart Validation Suffix**: Penambahan identitas visual `-A` pada nomor yang telah tervalidasi sebagai sertifikasi digital saat menuju loket pelayanan.
+* **Lightweight Architecture**: Dibangun menggunakan *Node.js* dan *SQLite* untuk memastikan performa yang responsif dengan konsumsi sumber daya server yang minimal.
+
+---
+
+## 🎯 Mengapa Sistem Ini Efektif?
+
+* **Pendekatan Human-Centric**: Mengutamakan martabat dan kenyamanan pengguna dengan menghapus kewajiban antrean berdiri.
+* **Penegakan Aturan (Enforcement)**: Fitur penolakan antrean berfungsi sebagai instrumen kepatuhan untuk memastikan hanya pengguna yang sah yang mendapatkan layanan.
+* **Transparansi Layanan**: Status kuota yang ditampilkan secara terbuka meningkatkan kepercayaan masyarakat terhadap kredibilitas penyelenggara layanan.
+
+---
+
+## 🚀 Cara Menjalankan Project
+
+1. Pastikan **Node.js** sudah terinstal di perangkat Anda.
+2. Clone repositori ini dan masuk ke direktori proyek.
+3. Instal dependensi:
+   ```bash
+   npm install
