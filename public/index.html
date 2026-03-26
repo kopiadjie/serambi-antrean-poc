@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antrean Penukaran Uang</title>
+    <style>
+        :root { --p: #2c3e50; --s: #27ae60; --d: #e74c3c; --g: #95a5a6; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 380px; text-align: center; margin-top: 30px; }
+        .logo-container { margin-bottom: 20px; }
+        .logo-container img { max-width: 180px; height: auto; }
+        .nomor { font-size: 5em; font-weight: 800; color: var(--p); margin: 10px 0; line-height: 1; }
+        .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; background: #eee; font-size: 0.9em; margin-bottom: 10px; }
+        .success-text { color: var(--s); font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+        button { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:disabled { background: var(--g) !important; cursor: not-allowed; opacity: 0.6; }
+        #btn-ambil { background: var(--p); color: white; }
+        .btn-terima { background: var(--s); color: white; }
+        .btn-tolak { background: white; color: var(--d); border: 1.5px solid var(--d); margin-top: 5px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; text-align: center; font-size: 16px; outline: none; }
+        .loading-spinner { color: var(--g); font-style: italic; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="logo-container">
+        <img src="gambar/logoserambi.png" alt="Serambi 2026" onerror="this.src='https://via.placeholder.com/180x60?text=SERAMBI+2026'">
+    </div>
+    
+    <div class="status-badge" id="info-kuota">Menghubungkan...</div>
+    <hr>
+
+    <div id="view-ambil" style="display:none;">
+        <p>Klik tombol di bawah untuk mendapatkan nomor antrean onsite.</p>
+        <button id="btn-ambil" onclick="ambilAntrean()">AMBIL NOMOR ANTREAN</button>
+    </div>
+
+    <div id="view-tunggu" style="display:none;">
+        <p style="margin-bottom: 5px;">Nomor Posisi Anda saat ini:</p>
+        <div class="nomor" id="display-nomor"><span class="loading-spinner">...</span></div>
+        <p style="font-size: 0.85em; color: #666; padding: 0 10px;">Tunjukkan halaman ini kepada petugas verifikasi untuk diverifikasi.</p>
+        <input style="font-size: 0.85em" type="password" id="kode-panitia" placeholder="Kode Petugas" inputmode="numeric">
+        <button class="btn-terima" onclick="verifikasi('terima')">KONFIRMASI TERIMA</button>
+        <button class="btn-tolak" onclick="verifikasi('tolak')">BATALKAN ANTREAN</button>
+    </div>
+
+    <div id="view-sukses" style="display:none;">
+        <div class="success-text">VERIFIKASI BERHASIL</div>
+        <div class="nomor" id="nomor-final" style="color: var(--s);">0</div>
+        <p style="color: #666;">Silakan melanjutkan proses penukaran uang di loket yang tersedia.</p>
+        <button onclick="resetSesi()" style="background: #eee; color: #666;">Ambil Antrean Baru</button>
+    </div>
+</div>
+
+<script>
+    let myId = localStorage.getItem('myId');
+    let isDone = localStorage.getItem('isDone') === 'true';
+    let finalNum = localStorage.getItem('finalNum');
+
+    async function sync() {
+        try {
+            const resStat = await fetch('/api/status');
+            const dStat = await resStat.json();
+            document.getElementById('info-kuota').innerText = `Sisa Kuota: ${dStat.sisaKuota} Orang`;
+            
+            const btnAmbil = document.getElementById('btn-ambil');
+            if(btnAmbil) btnAmbil.disabled = !dStat.bisaAmbil;
+
+            if (myId && !isDone) {
+                const resPos = await fetch(`/api/posisi/${myId}`);
+                if (resPos.ok) {
+                    const dPos = await resPos.json();
+                    
+                    // --- DETEKSI OTOMATIS JIKA ADMIN KLIK TERIMA ---
+                    if (dPos.status === 'diterima') {
+                        isDone = true;
+                        finalNum = (dPos.posisi || document.getElementById('display-nomor').innerText).toString().replace("-A", "") + "-A";
+                        
+                        localStorage.setItem('isDone', 'true');
+                        localStorage.setItem('finalNum', finalNum);
+                        render(); 
+                        return; 
+                    }
+
+                    if (dPos.status === 'ditolak' || dPos.status === 'not_found') {
+                        localStorage.clear();
+                        location.reload();
+                        return;
+                    }
+
+                    if (dPos.posisi > 0) {
+                        document.getElementById('display-nomor').innerText = dPos.posisi;
+                    }
+                }
+            }
+            render();
+        } catch (err) {
+            document.getElementById('info-kuota').innerText = "Koneksi Bermasalah";
+        }
+    }
+
+    async function ambilAntrean() {
+        const btn = document.getElementById('btn-ambil');
+        btn.disabled = true;
+        btn.innerText = "MEMPROSES...";
+        try {
+            const res = await fetch('/api/ambil', { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                myId = data.id;
+                isDone = false;
+                localStorage.setItem('myId', myId);
+                localStorage.setItem('isDone', 'false');
+                await sync();
+            }
+        } catch (e) {
+            alert("Gagal koneksi.");
+        } finally {
+            btn.innerText = "AMBIL NOMOR ANTREAN";
+        }
+    }
+
+    async function verifikasi(aksi) {
+        if (aksi === 'tolak' && !confirm("Batalkan antrean?")) return;
+        const kode = document.getElementById('kode-panitia').value;
+
+        if (aksi === 'terima' && !kode) {
+            alert("Harap masukkan kode petugas.");
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/verifikasi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: myId, aksi, kode })
+            });
+            
+            const data = await res.json();
+            if (res.ok) {
+                if (aksi === 'terima') {
+                    isDone = true;
+                    let baseNum = data.nomorBaru || document.getElementById('display-nomor').innerText;
+                    finalNum = baseNum.toString().replace("-A", "") + "-A"; 
+                    localStorage.setItem('isDone', 'true');
+                    localStorage.setItem('finalNum', finalNum);
+                } else {
+                    localStorage.clear();
+                    myId = null; isDone = false;
+                }
+                render();
+            } else { alert(data.message); }
+        } catch (e) { alert("Gagal verifikasi."); }
+    }
+
+    function render() {
+        // Logika tampilan eksplisit
+        document.getElementById('view-ambil').style.display = (!myId && !isDone) ? 'block' : 'none';
+        document.getElementById('view-tunggu').style.display = (myId && !isDone) ? 'block' : 'none';
+        document.getElementById('view-sukses').style.display = isDone ? 'block' : 'none';
+
+        if (isDone && finalNum) {
+            document.getElementById('nomor-final').innerText = finalNum;
+        }
+    }
+
+    function resetSesi() { 
+        const pin = prompt("Masukkan Kode Petugas:");
+        if (pin === "2247") {
+            localStorage.clear(); 
+            location.reload(); 
+        } else if (pin !== null) {
+            alert("Kode Salah!");
+        }
+    }
+
+    setInterval(sync, 2000);
+    sync();
+</script>
+</body>
+</html>

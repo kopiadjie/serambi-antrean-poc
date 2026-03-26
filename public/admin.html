@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Admin Antrean</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 900px; margin: auto; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: center; }
+        th { background: #2c3e50; color: white; }
+        .status-diterima { color: #27ae60; font-weight: bold; }
+        .status-ditolak { color: #e74c3c; font-weight: bold; }
+        .status-pending { color: #f39c12; font-weight: bold; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; }
+        .btn-reset { background: #c0392b; }
+        .btn-reset:hover { background: #a93226; }
+        .btn-terima { background: #27ae60; }
+        .btn-tolak { background: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-flex">
+            <h2>Monitoring Antrean Real-time</h2>
+            <button class="btn btn-reset" onclick="resetAntrean()">⚠ Reset Semua Antrean</button>
+        </div>
+
+        <table id="adminTable">
+            <thead>
+                <tr>
+                    <th>Database ID</th>
+                    <th>Nomor Urut</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function load() {
+            try {
+                const res = await fetch('/api/admin/list');
+                const data = await res.json();
+                const tbody = document.getElementById('tbody');
+                tbody.innerHTML = '';
+
+                data.forEach(d => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${d.id}</td>
+                        <td><strong>${d.status !== 'ditolak' ? d.nomor_urut : '-'}</strong></td>
+                        <td class="status-${d.status}">${d.status.toUpperCase()}</td>
+                        <td>
+                            ${d.status === 'pending' ? `
+                                <button class="btn btn-terima" onclick="aksi(${d.id},'terima')">Terima</button>
+                                <button class="btn btn-tolak" onclick="aksi(${d.id},'tolak')">Tolak</button>
+                            ` : '-'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error("Gagal memuat data");
+            }
+        }
+
+        async function aksi(id, tipe) {
+            await fetch('/api/verifikasi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, aksi: tipe, kode: "2247" })
+            });
+            load();
+        }
+
+        // FUNGSI BARU: RESET
+        async function resetAntrean() {
+            const yakin = confirm("PERINGATAN!\n\nSemua data antrean di database akan DIHAPUS PERMANEN dan nomor urut akan kembali ke 1. Lanjutkan?");
+            
+            if (yakin) {
+                const res = await fetch('/api/admin/reset', { method: 'POST' });
+                const hasil = await res.json();
+                alert(hasil.message);
+                load();
+            }
+        }
+        // Contoh fungsi di admin.html
+        async function terimaAntrean(id) {
+            const res = await fetch('/api/verifikasi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, aksi: 'terima' }) // Tanpa mengirim 'kode'
+            });
+            if(res.ok) {
+                loadData(); // Refresh tabel admin
+            }
+        }
+        // Auto Refresh setiap 3 detik
+        setInterval(load, 3000);
+        load();
+    </script>
+</body>
+</html>
