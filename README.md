@@ -52,3 +52,11 @@ Melalui *Dashboard Admin*, petugas memiliki kendali penuh untuk memvalidasi kese
 3. Instal dependensi:
    ```bash
    npm install
+
+4. Jalankan server:
+   ```bash
+   node server.js
+
+5. Akses layanan:
+``` Masyarakat: http://localhost```
+``` Dashboard Admin: http://localhost/admin.html```
