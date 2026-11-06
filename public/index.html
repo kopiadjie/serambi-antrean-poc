@@ -4,54 +4,185 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antrean Penukaran Uang</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #2c3e50; --s: #27ae60; --d: #e74c3c; --g: #95a5a6; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 380px; text-align: center; margin-top: 30px; }
-        .logo-container { margin-bottom: 20px; }
-        .logo-container img { max-width: 180px; height: auto; }
-        .nomor { font-size: 5em; font-weight: 800; color: var(--p); margin: 10px 0; line-height: 1; }
-        .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; background: #eee; font-size: 0.9em; margin-bottom: 10px; }
-        .success-text { color: var(--s); font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
-        button { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:disabled { background: var(--g) !important; cursor: not-allowed; opacity: 0.6; }
-        #btn-ambil { background: var(--p); color: white; }
-        .btn-terima { background: var(--s); color: white; }
-        .btn-tolak { background: white; color: var(--d); border: 1.5px solid var(--d); margin-top: 5px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; text-align: center; font-size: 16px; outline: none; }
-        .loading-spinner { color: var(--g); font-style: italic; font-size: 0.9em; }
+        :root {
+            color-scheme: light;
+            --ink: #172321;
+            --muted: #71807d;
+            --line: #e7eeeb;
+            --accent: #176b58;
+            --success: #16805f;
+            --danger: #c64b4b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 0;
+            padding: clamp(24px, 7vh, 64px) 16px;
+            background: #f7f9f8;
+            color: var(--ink);
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 440px;
+            margin: auto 0;
+            padding: clamp(24px, 6vw, 36px);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 18px 50px rgba(27, 55, 47, 0.07);
+            text-align: center;
+        }
+
+        .page-header { margin-bottom: 26px; }
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+        h1 {
+            max-width: 340px;
+            margin: 0 auto;
+            font-size: clamp(1.65rem, 6vw, 2rem);
+            font-weight: 600;
+            letter-spacing: -0.06em;
+            line-height: 1.14;
+        }
+        .intro {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+            padding: 6px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #fbfcfb;
+            color: #4f625c;
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+        hr { height: 1px; border: 0; background: var(--line); margin: 22px 0; }
+        .section-copy {
+            margin: 0 0 18px;
+            color: #53625e;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .nomor {
+            margin: 14px 0;
+            color: var(--ink);
+            font-size: clamp(4rem, 20vw, 5rem);
+            font-weight: 700;
+            letter-spacing: -0.08em;
+            line-height: 1;
+        }
+        .status-copy {
+            margin: 0 0 18px;
+            padding: 0 4px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.6;
+        }
+        .success-text {
+            margin-bottom: 8px;
+            color: var(--success);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+        .success-copy { color: var(--muted); line-height: 1.6; }
+
+        button {
+            width: 100%;
+            min-height: 52px;
+            margin: 8px 0;
+            padding: 14px 18px;
+            border: 1px solid transparent;
+            border-radius: 13px;
+            font: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+        }
+        button:not(:disabled):hover { transform: translateY(-1px); }
+        button:focus-visible, input:focus-visible { outline: 3px solid rgba(23, 107, 88, 0.2); outline-offset: 2px; }
+        button:disabled { background: #aab6b2 !important; cursor: not-allowed; opacity: 0.75; }
+        #btn-ambil { background: var(--accent); color: white; }
+        #btn-ambil:not(:disabled):hover, .btn-terima:hover { background: #125643; }
+        .btn-terima { background: var(--success); color: white; }
+        .btn-tolak { border-color: #f0dada; background: #fff; color: var(--danger); }
+        .btn-tolak:hover { border-color: var(--danger); }
+        .btn-reset { margin-top: 12px; border-color: var(--line); background: #f5f8f6; color: #52615c; }
+        input {
+            width: 100%;
+            min-height: 48px;
+            margin: 0 0 10px;
+            padding: 12px 14px;
+            border: 1px solid #dfe8e4;
+            border-radius: 12px;
+            background: #fbfcfb;
+            color: var(--ink);
+            font: inherit;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        input::placeholder { color: #9aa7a2; }
+        .loading-spinner { color: #91a09a; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="logo-container">
-        <img src="gambar/logoserambi.png" alt="Serambi 2026" onerror="this.src='https://via.placeholder.com/180x60?text=SERAMBI+2026'">
-    </div>
+    <header class="page-header">
+        <p class="eyebrow">Layanan Penukaran Uang</p>
+        <h1>Sistem Verifikasi Antrean Penukaran Uang</h1>
+        <p class="intro">Pantau antrean dan verifikasi layanan Anda dengan mudah.</p>
+    </header>
     
     <div class="status-badge" id="info-kuota">Menghubungkan...</div>
     <hr>
 
     <div id="view-ambil" style="display:none;">
-        <p>Klik tombol di bawah untuk mendapatkan nomor antrean onsite.</p>
+        <p class="section-copy">Klik tombol di bawah untuk mendapatkan nomor antrean onsite.</p>
         <button id="btn-ambil" onclick="ambilAntrean()">AMBIL NOMOR ANTREAN</button>
     </div>
 
     <div id="view-tunggu" style="display:none;">
-        <p style="margin-bottom: 5px;">Nomor Posisi Anda saat ini:</p>
+        <p class="section-copy" style="margin-bottom: 5px;">Nomor posisi Anda saat ini</p>
         <div class="nomor" id="display-nomor"><span class="loading-spinner">...</span></div>
-        <p style="font-size: 0.85em; color: #666; padding: 0 10px;">Tunjukkan halaman ini kepada petugas verifikasi untuk diverifikasi.</p>
-        <input style="font-size: 0.85em" type="password" id="kode-panitia" placeholder="Kode Petugas" inputmode="numeric">
+        <p class="status-copy">Tunjukkan halaman ini kepada petugas verifikasi untuk diverifikasi.</p>
+        <input type="password" id="kode-panitia" placeholder="Kode Petugas" inputmode="numeric">
         <button class="btn-terima" onclick="verifikasi('terima')">KONFIRMASI TERIMA</button>
         <button class="btn-tolak" onclick="verifikasi('tolak')">BATALKAN ANTREAN</button>
     </div>
 
     <div id="view-sukses" style="display:none;">
         <div class="success-text">VERIFIKASI BERHASIL</div>
-        <div class="nomor" id="nomor-final" style="color: var(--s);">0</div>
-        <p style="color: #666;">Silakan melanjutkan proses penukaran uang di loket yang tersedia.</p>
-        <button onclick="resetSesi()" style="background: #eee; color: #666;">Ambil Antrean Baru</button>
+        <div class="nomor" id="nomor-final" style="color: var(--success);">0</div>
+        <p class="success-copy">Silakan melanjutkan proses penukaran uang di loket yang tersedia.</p>
+        <button class="btn-reset" onclick="resetSesi()">AMBIL ANTREAN BARU</button>
     </div>
 </div>
 
